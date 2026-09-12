@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
@@ -17,7 +17,7 @@ import { usePlayers } from "@/hooks/usePlayers";
 import { GAME_META, getGamesForAge } from "@/lib/content";
 import { checkAnswer, generateLevelQuestions } from "@/lib/game-engine";
 import { applyCorrectAnswer, applyWrongAnswer } from "@/lib/progress";
-import { playAudio, playSuccessTone, playWrongTone, unlockAudio } from "@/lib/audio";
+import { playAudio, playSuccessTone, playWrongTone, stopAudio, unlockAudio } from "@/lib/audio";
 import type {
   GameQuestion,
   GameSessionResult,
@@ -54,6 +54,8 @@ function PlayPageInner() {
     null,
   );
   const [boundKey, setBoundKey] = useState<string | null>(null);
+  const [questions, setQuestions] = useState<GameQuestion[]>([]);
+  const feedbackTimerRef = useRef<number | null>(null);
 
   const requestedGame = searchParams.get("game");
 
@@ -72,9 +74,18 @@ function PlayPageInner() {
       : null;
 
   // Reset round state when player/game/session changes (React-recommended render adjustment).
-  if (sessionKey && sessionKey !== boundKey && activePlayer) {
+  // Questions are frozen for the whole round so saving progress cannot regenerate/retrigger audio.
+  if (sessionKey && sessionKey !== boundKey && activePlayer && gameType) {
     setBoundKey(sessionKey);
     setLocalProgress(activePlayer.progress);
+    setQuestions(
+      generateLevelQuestions(
+        gameType,
+        activePlayer.age,
+        activePlayer.progress,
+        QUESTIONS_PER_LEVEL,
+      ),
+    );
     setIndex(0);
     setResult(null);
     setLocked(false);
@@ -82,16 +93,6 @@ function PlayPageInner() {
     setSessionStars(0);
     setShowConfetti(false);
   }
-
-  const questions: GameQuestion[] = useMemo(() => {
-    if (!activePlayer || !gameType || !sessionKey) return [];
-    return generateLevelQuestions(
-      gameType,
-      activePlayer.age,
-      activePlayer.progress,
-      QUESTIONS_PER_LEVEL,
-    );
-  }, [activePlayer, gameType, sessionKey]);
 
   useEffect(() => {
     if (hydrated && !activePlayer) {
@@ -106,8 +107,22 @@ function PlayPageInner() {
     return () => {
       window.removeEventListener("pointerdown", unlock);
       window.removeEventListener("keydown", unlock);
+      if (feedbackTimerRef.current !== null) {
+        window.clearTimeout(feedbackTimerRef.current);
+        feedbackTimerRef.current = null;
+      }
+      stopAudio();
     };
   }, []);
+
+  // Clear pending feedback audio when a new round/session starts.
+  useEffect(() => {
+    if (feedbackTimerRef.current !== null) {
+      window.clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    stopAudio();
+  }, [sessionKey]);
 
   const current = questions[index];
 
@@ -117,6 +132,13 @@ function PlayPageInner() {
 
       const correct = checkAnswer(current, answer);
       setLocked(true);
+
+      // Stop any playing question audio so feedback is heard once.
+      stopAudio();
+      if (feedbackTimerRef.current !== null) {
+        window.clearTimeout(feedbackTimerRef.current);
+        feedbackTimerRef.current = null;
+      }
 
       if (correct) {
         const { progress, result: nextResult } = applyCorrectAnswer(
@@ -134,11 +156,12 @@ function PlayPageInner() {
           unlockAudio();
           playSuccessTone(settings.volume);
           // Biar "Betul!" dengar dulu, kemudian ulang jawapan
-          window.setTimeout(() => {
+          feedbackTimerRef.current = window.setTimeout(() => {
             void playAudio(current.targetText, current.promptAudio, {
               volume: settings.volume,
               soundEnabled: true,
             });
+            feedbackTimerRef.current = null;
           }, 700);
         }
       } else {

@@ -253,9 +253,17 @@ export function playWrongTone(volume = 0.5): void {
 
 function playUiClip(url: string, volume: number, onFail: () => void): void {
   if (typeof window === "undefined") return;
+  stopAll();
   const audio = new Audio(url);
+  currentAudio = audio;
   audio.volume = Math.max(0, Math.min(1, volume));
-  void audio.play().catch(onFail);
+  void audio.play().catch(() => {
+    if (currentAudio === audio) currentAudio = null;
+    onFail();
+  });
+  audio.onended = () => {
+    if (currentAudio === audio) currentAudio = null;
+  };
 }
 
 function playToneFallback(kind: "correct" | "wrong", volume: number): void {
