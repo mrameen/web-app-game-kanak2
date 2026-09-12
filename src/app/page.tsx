@@ -1,69 +1,147 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { AppShell } from "@/components/AppShell";
+import { AgeSelector } from "@/components/AgeSelector";
+import { PlayerSelector } from "@/components/PlayerSelector";
+import { usePlayers } from "@/hooks/usePlayers";
+import type { AgeGroup } from "@/lib/types";
+
+export default function HomePage() {
+  const router = useRouter();
+  const { hydrated, players, activePlayer, selectPlayer, addPlayer } =
+    usePlayers();
+  const [mode, setMode] = useState<"list" | "create">("list");
+  const [name, setName] = useState("");
+  const [age, setAge] = useState<AgeGroup | null>(null);
+  const [error, setError] = useState("");
+
+  if (!hydrated) {
+    return (
+      <AppShell showNav={false}>
+        <div className="flex min-h-[50vh] items-center justify-center text-xl font-bold text-slate-600">
+          Memuatkan...
+        </div>
+      </AppShell>
+    );
+  }
+
+  const handleCreate = () => {
+    if (!name.trim()) {
+      setError("Masukkan nama");
+      return;
+    }
+    if (!age) {
+      setError("Pilih umur");
+      return;
+    }
+    addPlayer(name.trim(), age);
+    router.push("/player");
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <AppShell showNav={players.length > 0}>
+      <section className="mb-8 text-center">
+        <p className="text-5xl" aria-hidden>
+          📚
+        </p>
+        <h1 className="mt-3 text-4xl font-black text-sky-800 sm:text-5xl">
+          Baca Ceria
+        </h1>
+        <p className="mt-2 text-xl font-bold text-slate-700">
+          Jom belajar membaca sambil bermain!
+        </p>
+      </section>
+
+      {mode === "list" ? (
+        <div className="space-y-6">
+          {players.length > 0 ? (
+            <>
+              <h2 className="text-2xl font-black text-slate-800">
+                Siapa bermain?
+              </h2>
+              <PlayerSelector
+                players={players}
+                activePlayerId={activePlayer?.id}
+                onSelect={(id) => {
+                  selectPlayer(id);
+                  router.push("/player");
+                }}
+                onAdd={() => {
+                  setMode("create");
+                  setError("");
+                }}
+              />
+            </>
+          ) : (
+            <div className="rounded-[2rem] bg-white/80 p-8 text-center shadow-lg">
+              <p className="text-2xl font-black text-slate-800">
+                Selamat datang!
+              </p>
+              <p className="mt-2 text-lg font-semibold text-slate-600">
+                Buat profil pemain untuk mula.
+              </p>
+              <button
+                type="button"
+                onClick={() => setMode("create")}
+                className="mt-6 min-h-16 rounded-2xl bg-sky-500 px-8 text-xl font-black text-white shadow-md transition hover:bg-sky-600 active:scale-95"
+              >
+                Tambah Pemain
+              </button>
+            </div>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+      ) : (
+        <div className="space-y-6 rounded-[2rem] bg-white/85 p-6 shadow-lg">
+          <h2 className="text-3xl font-black text-slate-800">Pemain baharu</h2>
+
+          <label className="block">
+            <span className="mb-2 block text-lg font-bold text-slate-700">
+              Nama
+            </span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={20}
+              placeholder="Contoh: Aiman"
+              aria-label="Nama pemain"
+              className="min-h-14 w-full rounded-2xl border-4 border-sky-200 bg-white px-4 text-2xl font-bold text-slate-800 outline-none focus:border-sky-500"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </label>
+
+          <div>
+            <p className="mb-3 text-lg font-bold text-slate-700">Umur saya</p>
+            <AgeSelector value={age} onSelect={setAge} />
+          </div>
+
+          {error ? (
+            <p className="text-base font-bold text-rose-600" role="alert">
+              {error}
+            </p>
+          ) : null}
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={handleCreate}
+              className="min-h-14 flex-1 rounded-2xl bg-emerald-500 px-6 text-xl font-black text-white shadow-md transition hover:bg-emerald-600 active:scale-95"
+            >
+              Simpan & Mula
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("list");
+                setError("");
+              }}
+              className="min-h-14 rounded-2xl bg-white px-6 text-lg font-bold text-slate-700 shadow"
+            >
+              Kembali
+            </button>
+          </div>
         </div>
-      </main>
-    </div>
+      )}
+    </AppShell>
   );
 }
