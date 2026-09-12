@@ -194,14 +194,22 @@ export function duckBgMusic(ms = 900): void {
 /** Happy rising sparkle — call on correct answer when music is on. */
 export function celebrateBgMusic(volume = desiredVolume): void {
   const audioCtx = ensureContext();
-  if (!audioCtx || !fx || !running) return;
+  const dest = fx;
+  if (!audioCtx || !dest || !running) return;
   void audioCtx.resume();
 
   const now = audioCtx.currentTime;
   const peak = Math.max(0.15, Math.min(1, volume)) * 0.55;
   const notes = [523.25, 659.25, 783.99, 1046.5];
   notes.forEach((freq, i) => {
-    playTone(fx, freq, now + i * 0.09, 0.28, peak, i === 3 ? "triangle" : "sine");
+    playTone(
+      dest,
+      freq,
+      now + i * 0.09,
+      0.28,
+      peak,
+      i === 3 ? "triangle" : "sine",
+    );
   });
 
   // Little bounce in master level
@@ -216,21 +224,23 @@ export function celebrateBgMusic(volume = desiredVolume): void {
 /** Soft “try again” motif — call on wrong answer when music is on. */
 export function encourageBgMusic(volume = desiredVolume): void {
   const audioCtx = ensureContext();
-  if (!audioCtx || !fx || !running) return;
+  const dest = fx;
+  if (!audioCtx || !dest || !running) return;
   void audioCtx.resume();
 
   const now = audioCtx.currentTime;
   const peak = Math.max(0.12, Math.min(1, volume)) * 0.4;
-  playTone(fx, 392.0, now, 0.22, peak, "sine");
-  playTone(fx, 349.23, now + 0.2, 0.28, peak * 0.9, "sine");
-  playTone(fx, 329.63, now + 0.45, 0.35, peak * 0.8, "triangle");
+  playTone(dest, 392.0, now, 0.22, peak, "sine");
+  playTone(dest, 349.23, now + 0.2, 0.28, peak * 0.9, "sine");
+  playTone(dest, 329.63, now + 0.45, 0.35, peak * 0.8, "triangle");
 }
 
 /** Tiny tap blip for UI interactions. */
 export function tapBgMusic(volume = desiredVolume): void {
   const audioCtx = ensureContext();
-  if (!audioCtx || !fx || !running) return;
+  const dest = fx;
+  if (!audioCtx || !dest || !running) return;
   void audioCtx.resume();
   const peak = Math.max(0.1, Math.min(1, volume)) * 0.35;
-  playTone(fx, 660, audioCtx.currentTime, 0.07, peak, "triangle");
+  playTone(dest, 660, audioCtx.currentTime, 0.07, peak, "triangle");
 }
