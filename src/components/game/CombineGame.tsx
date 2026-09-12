@@ -24,21 +24,44 @@ export function CombineGame({
   const [selected, setSelected] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!soundEnabled || !question.syllables || !isAudioUnlocked()) return;
+    if (!soundEnabled || !isAudioUnlocked()) return;
     let cancelled = false;
 
     void (async () => {
-      for (const part of question.syllables ?? []) {
+      const parts = question.syllables ?? [];
+      if (parts.length === 0) {
+        await playAudio(question.targetText, question.promptAudio, {
+          volume,
+          soundEnabled,
+        });
+        return;
+      }
+
+      for (const part of parts) {
         if (cancelled) return;
         await playAudio(part, undefined, { volume, soundEnabled });
-        await new Promise((r) => setTimeout(r, 280));
+        await new Promise((r) => setTimeout(r, 220));
       }
+
+      if (cancelled) return;
+      await new Promise((r) => setTimeout(r, 180));
+      await playAudio(question.targetText, question.promptAudio, {
+        volume,
+        soundEnabled,
+      });
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [question.id, question.syllables, volume, soundEnabled]);
+  }, [
+    question.id,
+    question.syllables,
+    question.targetText,
+    question.promptAudio,
+    volume,
+    soundEnabled,
+  ]);
 
   return (
     <div className="space-y-6">

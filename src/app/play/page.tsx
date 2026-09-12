@@ -115,13 +115,15 @@ function PlayPageInner() {
     };
   }, []);
 
-  // Clear pending feedback audio when a new round/session starts.
+  // Clear pending feedback timer when a new round/session starts.
+  // Do NOT stopAudio here — it races child autoplay effects and mutes the first question.
   useEffect(() => {
-    if (feedbackTimerRef.current !== null) {
-      window.clearTimeout(feedbackTimerRef.current);
-      feedbackTimerRef.current = null;
-    }
-    stopAudio();
+    return () => {
+      if (feedbackTimerRef.current !== null) {
+        window.clearTimeout(feedbackTimerRef.current);
+        feedbackTimerRef.current = null;
+      }
+    };
   }, [sessionKey]);
 
   const current = questions[index];
@@ -192,6 +194,11 @@ function PlayPageInner() {
     setShowConfetti(false);
     setResult(null);
     setLocked(false);
+    if (feedbackTimerRef.current !== null) {
+      window.clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    stopAudio();
 
     if (index + 1 >= questions.length) {
       setFinished(true);

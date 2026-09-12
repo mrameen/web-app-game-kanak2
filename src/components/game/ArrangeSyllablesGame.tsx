@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { GameQuestion } from "@/lib/types";
 import { AudioButton } from "@/components/AudioButton";
-import { unlockAudio } from "@/lib/audio";
+import { isAudioUnlocked, playAudio, unlockAudio } from "@/lib/audio";
 
 interface Props {
   question: GameQuestion;
@@ -22,6 +22,20 @@ export function ArrangeSyllablesGame({
 }: Props) {
   const [bank, setBank] = useState(() => question.options);
   const [slots, setSlots] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!soundEnabled || !isAudioUnlocked()) return;
+    void playAudio(question.targetText, question.promptAudio, {
+      volume,
+      soundEnabled,
+    });
+  }, [
+    question.id,
+    question.targetText,
+    question.promptAudio,
+    volume,
+    soundEnabled,
+  ]);
 
   const pick = (syllable: string, index: number) => {
     if (disabled) return;
@@ -61,6 +75,9 @@ export function ArrangeSyllablesGame({
             soundEnabled={soundEnabled}
           />
         </div>
+        <p className="mt-2 text-base font-bold text-sky-700">
+          Tekan butang untuk dengar
+        </p>
       </div>
 
       <div className="flex min-h-24 flex-wrap items-center justify-center gap-3 rounded-[1.75rem] border-4 border-dashed border-sky-300 bg-sky-50/80 p-4">
@@ -87,6 +104,7 @@ export function ArrangeSyllablesGame({
             aria-label={`Pilih suku kata ${syllable}`}
             onClick={() => {
               unlockAudio();
+              void playAudio(syllable, undefined, { volume, soundEnabled });
               pick(syllable, index);
             }}
             className="min-h-16 rounded-2xl bg-amber-300 px-6 text-3xl font-black text-amber-950 shadow-md transition hover:bg-amber-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-800 disabled:opacity-60"

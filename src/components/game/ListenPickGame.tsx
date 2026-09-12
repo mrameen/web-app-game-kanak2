@@ -25,13 +25,18 @@ export function ListenPickGame({
 
   useEffect(() => {
     if (!soundEnabled) return;
-    // Autoplay only after user has unlocked audio (browser policy).
     if (!isAudioUnlocked()) return;
     void playAudio(question.targetText, question.promptAudio, {
       volume,
       soundEnabled,
     });
-  }, [question.id, question.targetText, question.promptAudio, volume, soundEnabled]);
+  }, [
+    question.id,
+    question.targetText,
+    question.promptAudio,
+    volume,
+    soundEnabled,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -43,7 +48,9 @@ export function ListenPickGame({
           volume={volume}
           soundEnabled={soundEnabled}
         />
-        <p className="text-base font-bold text-sky-700">Tekan butang untuk dengar</p>
+        <p className="text-base font-bold text-sky-700">
+          Tekan butang untuk dengar
+        </p>
         <p className="text-5xl font-black tracking-widest text-sky-800">
           {question.targetText}
         </p>

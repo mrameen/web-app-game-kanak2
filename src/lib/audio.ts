@@ -205,6 +205,32 @@ function playAudioFile(url: string, volume: number): Promise<boolean> {
 }
 
 /**
+ * Resolve a likely public MP3 path for short tokens (letters/syllables).
+ * Full words/sentences should pass explicit audioUrl from content JSON.
+ */
+export function resolveAudioUrl(
+  text: string,
+  explicitUrl?: string,
+): string | undefined {
+  if (explicitUrl) return explicitUrl;
+
+  const raw = text.trim().toLowerCase();
+  if (!raw) return undefined;
+
+  // Single letter: A, B, M
+  if (/^[a-z]$/.test(raw)) {
+    return `/audio/letters/${raw}.mp3`;
+  }
+
+  // Open syllable / short token: BA, JU, KE, SUT, CING
+  if (/^[a-z]{1,6}$/.test(raw)) {
+    return `/audio/syllables/${raw}.mp3`;
+  }
+
+  return undefined;
+}
+
+/**
  * Play learning audio.
  * Try MP3 first (files ship in /public/audio). Fall back to SpeechSynthesis.
  */
@@ -218,18 +244,20 @@ export async function playAudio(
 
   if (!soundEnabled || typeof window === "undefined") return;
 
+  const url = resolveAudioUrl(text, audioUrl);
+
   try {
     stopMp3Only();
 
-    if (audioUrl) {
+    if (url) {
       // Skip known-missing files; otherwise try MP3 immediately.
-      if (audioFileCache.get(audioUrl) !== false) {
-        const played = await playAudioFile(audioUrl, volume);
+      if (audioFileCache.get(url) !== false) {
+        const played = await playAudioFile(url, volume);
         if (played) {
-          audioFileCache.set(audioUrl, true);
+          audioFileCache.set(url, true);
           return;
         }
-        audioFileCache.set(audioUrl, false);
+        audioFileCache.set(url, false);
       }
     }
 

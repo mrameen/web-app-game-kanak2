@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { GameQuestion } from "@/lib/types";
 import { AnswerButton } from "@/components/AnswerButton";
 import { AudioButton } from "@/components/AudioButton";
-import { unlockAudio } from "@/lib/audio";
+import { isAudioUnlocked, playAudio, unlockAudio } from "@/lib/audio";
 
 interface Props {
   question: GameQuestion;
@@ -22,6 +22,20 @@ export function CompleteWordGame({
   onAnswer,
 }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!soundEnabled || !isAudioUnlocked()) return;
+    void playAudio(question.targetText, question.promptAudio, {
+      volume,
+      soundEnabled,
+    });
+  }, [
+    question.id,
+    question.targetText,
+    question.promptAudio,
+    volume,
+    soundEnabled,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -44,6 +58,9 @@ export function CompleteWordGame({
             label={`Dengar petunjuk ${question.targetText}`}
           />
         </div>
+        <p className="mt-2 text-base font-bold text-sky-700">
+          Tekan butang untuk dengar
+        </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">

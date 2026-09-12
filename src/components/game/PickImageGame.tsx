@@ -28,7 +28,13 @@ export function PickImageGame({
       volume,
       soundEnabled,
     });
-  }, [question.id, question.targetText, question.promptAudio, volume, soundEnabled]);
+  }, [
+    question.id,
+    question.targetText,
+    question.promptAudio,
+    volume,
+    soundEnabled,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -40,7 +46,9 @@ export function PickImageGame({
           volume={volume}
           soundEnabled={soundEnabled}
         />
-        <p className="text-base font-bold text-sky-700">Tekan butang untuk dengar</p>
+        <p className="text-base font-bold text-sky-700">
+          Tekan butang untuk dengar
+        </p>
         <p className="text-2xl font-black text-sky-800">{question.targetText}</p>
       </div>
 
