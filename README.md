@@ -61,16 +61,16 @@ Keperluan: Docker + Docker Compose plugin.
 ```bash
 git clone git@github.com:mrameen/web-app-game-kanak2.git
 cd web-app-game-kanak2
-cp .env.example .env   # optional, tukar APP_PORT jika perlu
-docker compose up -d --build
+cp .env.example .env   # optional
+docker-compose up -d --build
 ```
 
 App akan listen di `http://SERVER_IP:3000`.
 
-Perintah berguna:
+## Public vs Admin
 
-```bash
-docker compose ps
-docker compose logs -f web
-docker compose down
-```
+- Public (`/`): masukkan **nama + umur** sahaja. Tidak papar senarai pemain lain.
+- Admin (`/admin`): log masuk untuk padam pemain, reset progress, lihat semua profil.
+
+Default kata laluan admin: `baca@admin`  
+Boleh override dengan env `NEXT_PUBLIC_ADMIN_PASSWORD`.

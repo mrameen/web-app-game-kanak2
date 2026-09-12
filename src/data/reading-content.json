@@ -1,7 +1,9 @@
 [
   {
     "id": "letter-a",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "A",
     "audio": "/audio/letters/a.mp3",
@@ -10,7 +12,9 @@
   },
   {
     "id": "letter-b",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "B",
     "audio": "/audio/letters/b.mp3",
@@ -19,7 +23,9 @@
   },
   {
     "id": "letter-c",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "C",
     "audio": "/audio/letters/c.mp3",
@@ -28,7 +34,9 @@
   },
   {
     "id": "letter-d",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "D",
     "audio": "/audio/letters/d.mp3",
@@ -37,7 +45,9 @@
   },
   {
     "id": "letter-i",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "I",
     "audio": "/audio/letters/i.mp3",
@@ -46,7 +56,9 @@
   },
   {
     "id": "letter-k",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "K",
     "audio": "/audio/letters/k.mp3",
@@ -55,7 +67,9 @@
   },
   {
     "id": "letter-m",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "M",
     "audio": "/audio/letters/m.mp3",
@@ -64,7 +78,9 @@
   },
   {
     "id": "letter-n",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "N",
     "audio": "/audio/letters/n.mp3",
@@ -73,7 +89,9 @@
   },
   {
     "id": "letter-p",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "P",
     "audio": "/audio/letters/p.mp3",
@@ -82,7 +100,9 @@
   },
   {
     "id": "letter-s",
-    "age": [3],
+    "age": [
+      3
+    ],
     "type": "letter",
     "text": "S",
     "audio": "/audio/letters/s.mp3",
@@ -91,7 +111,10 @@
   },
   {
     "id": "syllable-ba",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "BA",
     "audio": "/audio/syllables/ba.mp3",
@@ -99,7 +122,10 @@
   },
   {
     "id": "syllable-ca",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "CA",
     "audio": "/audio/syllables/ca.mp3",
@@ -107,7 +133,10 @@
   },
   {
     "id": "syllable-da",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "DA",
     "audio": "/audio/syllables/da.mp3",
@@ -115,7 +144,10 @@
   },
   {
     "id": "syllable-ma",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "MA",
     "audio": "/audio/syllables/ma.mp3",
@@ -123,7 +155,10 @@
   },
   {
     "id": "syllable-pa",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "PA",
     "audio": "/audio/syllables/pa.mp3",
@@ -131,7 +166,10 @@
   },
   {
     "id": "syllable-sa",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "SA",
     "audio": "/audio/syllables/sa.mp3",
@@ -139,7 +177,10 @@
   },
   {
     "id": "syllable-ta",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "TA",
     "audio": "/audio/syllables/ta.mp3",
@@ -147,7 +188,10 @@
   },
   {
     "id": "syllable-bo",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "BO",
     "audio": "/audio/syllables/bo.mp3",
@@ -155,7 +199,10 @@
   },
   {
     "id": "syllable-bu",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "BU",
     "audio": "/audio/syllables/bu.mp3",
@@ -163,7 +210,10 @@
   },
   {
     "id": "syllable-ku",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "KU",
     "audio": "/audio/syllables/ku.mp3",
@@ -171,7 +221,10 @@
   },
   {
     "id": "syllable-ju",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "JU",
     "audio": "/audio/syllables/ju.mp3",
@@ -179,7 +232,10 @@
   },
   {
     "id": "syllable-la",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "LA",
     "audio": "/audio/syllables/la.mp3",
@@ -187,7 +243,10 @@
   },
   {
     "id": "syllable-ki",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "KI",
     "audio": "/audio/syllables/ki.mp3",
@@ -195,7 +254,10 @@
   },
   {
     "id": "syllable-pi",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "PI",
     "audio": "/audio/syllables/pi.mp3",
@@ -203,7 +265,10 @@
   },
   {
     "id": "syllable-to",
-    "age": [3, 4],
+    "age": [
+      3,
+      4
+    ],
     "type": "syllable",
     "text": "TO",
     "audio": "/audio/syllables/to.mp3",
@@ -211,10 +276,17 @@
   },
   {
     "id": "word-baju",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "BAJU",
-    "syllables": ["BA", "JU"],
+    "syllables": [
+      "BA",
+      "JU"
+    ],
     "audio": "/audio/words/baju.mp3",
     "emoji": "👕",
     "meaning": "pakaian",
@@ -222,10 +294,17 @@
   },
   {
     "id": "word-bola",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "BOLA",
-    "syllables": ["BO", "LA"],
+    "syllables": [
+      "BO",
+      "LA"
+    ],
     "audio": "/audio/words/bola.mp3",
     "emoji": "⚽",
     "meaning": "mainan bulat",
@@ -233,10 +312,17 @@
   },
   {
     "id": "word-buku",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "BUKU",
-    "syllables": ["BU", "KU"],
+    "syllables": [
+      "BU",
+      "KU"
+    ],
     "audio": "/audio/words/buku.mp3",
     "emoji": "📖",
     "meaning": "untuk dibaca",
@@ -244,10 +330,17 @@
   },
   {
     "id": "word-mata",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "MATA",
-    "syllables": ["MA", "TA"],
+    "syllables": [
+      "MA",
+      "TA"
+    ],
     "audio": "/audio/words/mata.mp3",
     "emoji": "👀",
     "meaning": "untuk melihat",
@@ -255,10 +348,17 @@
   },
   {
     "id": "word-kaki",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "KAKI",
-    "syllables": ["KA", "KI"],
+    "syllables": [
+      "KA",
+      "KI"
+    ],
     "audio": "/audio/words/kaki.mp3",
     "emoji": "🦶",
     "meaning": "untuk berjalan",
@@ -266,10 +366,17 @@
   },
   {
     "id": "word-sapi",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "SAPI",
-    "syllables": ["SA", "PI"],
+    "syllables": [
+      "SA",
+      "PI"
+    ],
     "audio": "/audio/words/sapi.mp3",
     "emoji": "🐄",
     "meaning": "haiwan",
@@ -277,10 +384,17 @@
   },
   {
     "id": "word-topi",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "TOPI",
-    "syllables": ["TO", "PI"],
+    "syllables": [
+      "TO",
+      "PI"
+    ],
     "audio": "/audio/words/topi.mp3",
     "emoji": "🧢",
     "meaning": "penutup kepala",
@@ -288,10 +402,17 @@
   },
   {
     "id": "word-meja",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "MEJA",
-    "syllables": ["ME", "JA"],
+    "syllables": [
+      "ME",
+      "JA"
+    ],
     "audio": "/audio/words/meja.mp3",
     "emoji": "🪑",
     "meaning": "tempat tulis",
@@ -299,10 +420,17 @@
   },
   {
     "id": "word-kasut",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "KASUT",
-    "syllables": ["KA", "SUT"],
+    "syllables": [
+      "KA",
+      "SUT"
+    ],
     "audio": "/audio/words/kasut.mp3",
     "emoji": "👟",
     "meaning": "pakai di kaki",
@@ -310,10 +438,16 @@
   },
   {
     "id": "word-bas",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "BAS",
-    "syllables": ["BAS"],
+    "syllables": [
+      "BAS"
+    ],
     "audio": "/audio/words/bas.mp3",
     "emoji": "🚌",
     "meaning": "kenderaan",
@@ -321,10 +455,17 @@
   },
   {
     "id": "word-roti",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "ROTI",
-    "syllables": ["RO", "TI"],
+    "syllables": [
+      "RO",
+      "TI"
+    ],
     "audio": "/audio/words/roti.mp3",
     "emoji": "🍞",
     "meaning": "makanan",
@@ -332,10 +473,17 @@
   },
   {
     "id": "word-nasi",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "NASI",
-    "syllables": ["NA", "SI"],
+    "syllables": [
+      "NA",
+      "SI"
+    ],
     "audio": "/audio/words/nasi.mp3",
     "emoji": "🍚",
     "meaning": "makanan",
@@ -343,10 +491,17 @@
   },
   {
     "id": "word-gigi",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "GIGI",
-    "syllables": ["GI", "GI"],
+    "syllables": [
+      "GI",
+      "GI"
+    ],
     "audio": "/audio/words/gigi.mp3",
     "emoji": "🦷",
     "meaning": "di dalam mulut",
@@ -354,10 +509,17 @@
   },
   {
     "id": "word-dada",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "DADA",
-    "syllables": ["DA", "DA"],
+    "syllables": [
+      "DA",
+      "DA"
+    ],
     "audio": "/audio/words/dada.mp3",
     "emoji": "🫀",
     "meaning": "bahagian badan",
@@ -365,10 +527,17 @@
   },
   {
     "id": "word-pipi",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "PIPI",
-    "syllables": ["PI", "PI"],
+    "syllables": [
+      "PI",
+      "PI"
+    ],
     "audio": "/audio/words/pipi.mp3",
     "emoji": "😊",
     "meaning": "bahagian muka",
@@ -376,10 +545,17 @@
   },
   {
     "id": "word-ibu",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "IBU",
-    "syllables": ["I", "BU"],
+    "syllables": [
+      "I",
+      "BU"
+    ],
     "audio": "/audio/words/ibu.mp3",
     "emoji": "👩",
     "meaning": "mak",
@@ -387,10 +563,17 @@
   },
   {
     "id": "word-ayah",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "AYAH",
-    "syllables": ["A", "YAH"],
+    "syllables": [
+      "A",
+      "YAH"
+    ],
     "audio": "/audio/words/ayah.mp3",
     "emoji": "👨",
     "meaning": "pak",
@@ -398,10 +581,17 @@
   },
   {
     "id": "word-air",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "AIR",
-    "syllables": ["A", "IR"],
+    "syllables": [
+      "A",
+      "IR"
+    ],
     "audio": "/audio/words/air.mp3",
     "emoji": "💧",
     "meaning": "untuk minum",
@@ -409,10 +599,16 @@
   },
   {
     "id": "word-rumah",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "word",
     "text": "RUMAH",
-    "syllables": ["RU", "MAH"],
+    "syllables": [
+      "RU",
+      "MAH"
+    ],
     "audio": "/audio/words/rumah.mp3",
     "emoji": "🏠",
     "meaning": "tempat tinggal",
@@ -420,10 +616,17 @@
   },
   {
     "id": "word-kerusi",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "word",
     "text": "KERUSI",
-    "syllables": ["KE", "RU", "SI"],
+    "syllables": [
+      "KE",
+      "RU",
+      "SI"
+    ],
     "audio": "/audio/words/kerusi.mp3",
     "emoji": "🪑",
     "meaning": "untuk duduk",
@@ -431,10 +634,17 @@
   },
   {
     "id": "word-sepatu",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "word",
     "text": "SEPATU",
-    "syllables": ["SE", "PA", "TU"],
+    "syllables": [
+      "SE",
+      "PA",
+      "TU"
+    ],
     "audio": "/audio/words/sepatu.mp3",
     "emoji": "👞",
     "meaning": "kasut",
@@ -442,10 +652,16 @@
   },
   {
     "id": "word-pisang",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "word",
     "text": "PISANG",
-    "syllables": ["PI", "SANG"],
+    "syllables": [
+      "PI",
+      "SANG"
+    ],
     "audio": "/audio/words/pisang.mp3",
     "emoji": "🍌",
     "meaning": "buah",
@@ -453,10 +669,16 @@
   },
   {
     "id": "word-mangga",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "word",
     "text": "MANGGA",
-    "syllables": ["MANG", "GA"],
+    "syllables": [
+      "MANG",
+      "GA"
+    ],
     "audio": "/audio/words/mangga.mp3",
     "emoji": "🥭",
     "meaning": "buah",
@@ -464,10 +686,16 @@
   },
   {
     "id": "word-bunga",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "word",
     "text": "BUNGA",
-    "syllables": ["BU", "NGA"],
+    "syllables": [
+      "BU",
+      "NGA"
+    ],
     "audio": "/audio/words/bunga.mp3",
     "emoji": "🌸",
     "meaning": "cantik",
@@ -475,10 +703,16 @@
   },
   {
     "id": "word-kucing",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "word",
     "text": "KUCING",
-    "syllables": ["KU", "CING"],
+    "syllables": [
+      "KU",
+      "CING"
+    ],
     "audio": "/audio/words/kucing.mp3",
     "emoji": "🐱",
     "meaning": "haiwan peliharaan",
@@ -486,10 +720,17 @@
   },
   {
     "id": "word-ayam",
-    "age": [4, 5],
+    "age": [
+      4,
+      5,
+      6
+    ],
     "type": "word",
     "text": "AYAM",
-    "syllables": ["A", "YAM"],
+    "syllables": [
+      "A",
+      "YAM"
+    ],
     "audio": "/audio/words/ayam.mp3",
     "emoji": "🐔",
     "meaning": "haiwan",
@@ -497,7 +738,10 @@
   },
   {
     "id": "sentence-ini-bola",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Ini bola.",
     "audio": "/audio/sentences/ini-bola.mp3",
@@ -507,7 +751,10 @@
   },
   {
     "id": "sentence-ini-buku",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Ini buku.",
     "audio": "/audio/sentences/ini-buku.mp3",
@@ -517,7 +764,10 @@
   },
   {
     "id": "sentence-ayah-makan",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Ayah makan.",
     "audio": "/audio/sentences/ayah-makan.mp3",
@@ -527,7 +777,10 @@
   },
   {
     "id": "sentence-ibu-masak",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Ibu masak.",
     "audio": "/audio/sentences/ibu-masak.mp3",
@@ -537,7 +790,10 @@
   },
   {
     "id": "sentence-saya-baca",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Saya baca.",
     "audio": "/audio/sentences/saya-baca.mp3",
@@ -547,7 +803,10 @@
   },
   {
     "id": "sentence-adik-main",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Adik main.",
     "audio": "/audio/sentences/adik-main.mp3",
@@ -557,7 +816,10 @@
   },
   {
     "id": "sentence-kucing-tidur",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Kucing tidur.",
     "audio": "/audio/sentences/kucing-tidur.mp3",
@@ -567,7 +829,10 @@
   },
   {
     "id": "sentence-saya-minum",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Saya minum.",
     "audio": "/audio/sentences/saya-minum.mp3",
@@ -577,7 +842,10 @@
   },
   {
     "id": "sentence-ini-rumah",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Ini rumah.",
     "audio": "/audio/sentences/ini-rumah.mp3",
@@ -587,7 +855,10 @@
   },
   {
     "id": "sentence-makan-nasi",
-    "age": [5],
+    "age": [
+      5,
+      6
+    ],
     "type": "sentence",
     "text": "Makan nasi.",
     "audio": "/audio/sentences/makan-nasi.mp3",

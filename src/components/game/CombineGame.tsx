@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import type { GameQuestion } from "@/lib/types";
 import { AnswerButton } from "@/components/AnswerButton";
-import { AudioButton } from "@/components/AudioButton";
+import { getAudioForToken } from "@/lib/content";
 import { isAudioUnlocked, playAudio, unlockAudio } from "@/lib/audio";
+import { Volume2 } from "lucide-react";
 
 interface Props {
   question: GameQuestion;
@@ -12,6 +13,35 @@ interface Props {
   volume?: number;
   soundEnabled?: boolean;
   onAnswer: (answer: string) => void;
+}
+
+async function playCombineSequence(
+  question: GameQuestion,
+  volume: number,
+  soundEnabled: boolean,
+  isCancelled?: () => boolean,
+): Promise<void> {
+  const parts = question.syllables ?? [];
+  if (parts.length === 0) {
+    await playAudio(question.targetText, question.promptAudio, {
+      volume,
+      soundEnabled,
+    });
+    return;
+  }
+
+  for (const part of parts) {
+    if (isCancelled?.()) return;
+    await playAudio(part, getAudioForToken(part), { volume, soundEnabled });
+    await new Promise((r) => setTimeout(r, 280));
+  }
+
+  if (isCancelled?.()) return;
+  await new Promise((r) => setTimeout(r, 200));
+  await playAudio(question.targetText, question.promptAudio, {
+    volume,
+    soundEnabled,
+  });
 }
 
 export function CombineGame({
@@ -22,46 +52,42 @@ export function CombineGame({
   onAnswer,
 }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     if (!soundEnabled || !isAudioUnlocked()) return;
     let cancelled = false;
 
     void (async () => {
-      const parts = question.syllables ?? [];
-      if (parts.length === 0) {
-        await playAudio(question.targetText, question.promptAudio, {
+      setPlaying(true);
+      try {
+        await playCombineSequence(
+          question,
           volume,
           soundEnabled,
-        });
-        return;
+          () => cancelled,
+        );
+      } finally {
+        if (!cancelled) setPlaying(false);
       }
-
-      for (const part of parts) {
-        if (cancelled) return;
-        await playAudio(part, undefined, { volume, soundEnabled });
-        await new Promise((r) => setTimeout(r, 220));
-      }
-
-      if (cancelled) return;
-      await new Promise((r) => setTimeout(r, 180));
-      await playAudio(question.targetText, question.promptAudio, {
-        volume,
-        soundEnabled,
-      });
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [
-    question.id,
-    question.syllables,
-    question.targetText,
-    question.promptAudio,
-    volume,
-    soundEnabled,
-  ]);
+    // Replay when the question identity changes (frozen per round).
+  }, [question, volume, soundEnabled]);
+
+  const replay = async () => {
+    if (!soundEnabled || playing) return;
+    unlockAudio();
+    setPlaying(true);
+    try {
+      await playCombineSequence(question, volume, soundEnabled);
+    } finally {
+      setPlaying(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -71,13 +97,18 @@ export function CombineGame({
           {(question.syllables ?? []).join(" + ")}
         </p>
         <div className="mt-4 flex justify-center">
-          <AudioButton
-            text={question.targetText}
-            audioUrl={question.promptAudio}
-            volume={volume}
-            soundEnabled={soundEnabled}
-            label={`Dengar ${question.targetText}`}
-          />
+          <button
+            type="button"
+            onClick={() => {
+              void replay();
+            }}
+            disabled={!soundEnabled || playing}
+            aria-label={`Dengar ${(question.syllables ?? []).join(" plus ")} jadi ${question.targetText}`}
+            aria-pressed={playing}
+            className={`inline-flex h-20 w-20 items-center justify-center rounded-full bg-sky-400 text-white shadow-lg transition active:scale-95 hover:bg-sky-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700 sm:h-24 sm:w-24 ${playing ? "animate-pulse scale-110" : ""} disabled:opacity-60`}
+          >
+            <Volume2 className="h-8 w-8 sm:h-10 sm:w-10" aria-hidden />
+          </button>
         </div>
         <p className="mt-2 text-base font-bold text-sky-700">
           Tekan butang untuk dengar

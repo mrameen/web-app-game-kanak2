@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Home, Settings, BarChart3 } from "lucide-react";
+import { BackgroundMusic } from "@/components/BackgroundMusic";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ interface AppShellProps {
 export function AppShell({ children, title, showNav = true }: AppShellProps) {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
+      <BackgroundMusic />
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#fde68a55,transparent_35%),radial-gradient(circle_at_80%_0%,#7dd3fc66,transparent_40%),radial-gradient(circle_at_50%_80%,#86efac55,transparent_40%),linear-gradient(180deg,#e0f2fe,#fff7ed)]" />
 
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">

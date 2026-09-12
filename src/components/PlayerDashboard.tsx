@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import type { Player } from "@/lib/types";
+import type { AgeGroup, Player } from "@/lib/types";
 import { ProgressBar } from "./ProgressBar";
-import { getGamesForAge, GAME_META } from "@/lib/content";
+import { getGamesForAgeByCategory, GAME_META } from "@/lib/content";
 import { GameCard } from "./GameCard";
+import { AgeSelector } from "./AgeSelector";
 
 interface PlayerDashboardProps {
   player: Player;
+  onChangeAge: (age: AgeGroup) => void;
 }
 
 const GAME_COLORS = [
@@ -16,11 +19,15 @@ const GAME_COLORS = [
   "from-emerald-300 to-lime-200",
   "from-amber-300 to-yellow-200",
   "from-fuchsia-300 to-pink-200",
+  "from-indigo-300 to-sky-200",
 ];
 
-export function PlayerDashboard({ player }: PlayerDashboardProps) {
-  const games = getGamesForAge(player.age);
+export function PlayerDashboard({ player, onChangeAge }: PlayerDashboardProps) {
+  const readingGames = getGamesForAgeByCategory(player.age, "reading");
+  const mathGames = getGamesForAgeByCategory(player.age, "math");
+  const firstGame = readingGames[0] ?? mathGames[0] ?? "listen-pick";
   const levelProgress = player.progress.correctAnswers % 8;
+  const [showAgePicker, setShowAgePicker] = useState(false);
 
   return (
     <div className="space-y-8">
@@ -29,7 +36,39 @@ export function PlayerDashboard({ player }: PlayerDashboardProps) {
         <h1 className="text-4xl font-black text-slate-800 sm:text-5xl">
           {player.name}! 👋
         </h1>
-        <p className="mt-2 text-2xl font-bold text-slate-700">Jom membaca!</p>
+        <p className="mt-2 text-2xl font-bold text-slate-700">
+          Jom belajar sambil bermain!
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <span className="rounded-2xl bg-sky-100 px-4 py-2 text-base font-black text-sky-800">
+            Umur {player.age} tahun
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowAgePicker((v) => !v)}
+            className="rounded-2xl bg-white px-4 py-2 text-base font-black text-slate-700 shadow"
+            aria-expanded={showAgePicker}
+          >
+            {showAgePicker ? "Tutup" : "Tukar umur"}
+          </button>
+        </div>
+
+        {showAgePicker ? (
+          <div className="mt-4 rounded-[1.5rem] bg-sky-50/80 p-4">
+            <p className="mb-3 text-sm font-bold text-slate-600">
+              Pilih umur untuk tukar tahap permainan
+            </p>
+            <AgeSelector
+              compact
+              value={player.age}
+              onSelect={(age) => {
+                onChangeAge(age);
+                setShowAgePicker(false);
+              }}
+            />
+          </div>
+        ) : null}
 
         <div className="mt-6 grid grid-cols-3 gap-3 text-center">
           <div className="rounded-2xl bg-amber-100 p-3">
@@ -71,7 +110,7 @@ export function PlayerDashboard({ player }: PlayerDashboardProps) {
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <Link
-            href={`/play?game=${games[0]}`}
+            href={`/play?game=${firstGame}`}
             className="flex min-h-16 items-center justify-center rounded-2xl bg-sky-500 px-4 text-center text-lg font-black text-white shadow-md transition hover:bg-sky-600 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-800"
           >
             MULA BERMAIN
@@ -92,9 +131,9 @@ export function PlayerDashboard({ player }: PlayerDashboardProps) {
       </section>
 
       <section id="aktiviti">
-        <h2 className="mb-4 text-3xl font-black text-slate-800">Aktiviti</h2>
+        <h2 className="mb-4 text-3xl font-black text-slate-800">Bacaan</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          {games.map((game, index) => (
+          {readingGames.map((game, index) => (
             <GameCard
               key={game}
               title={GAME_META[game].title}
@@ -102,6 +141,22 @@ export function PlayerDashboard({ player }: PlayerDashboardProps) {
               description={GAME_META[game].description}
               href={`/play?game=${game}`}
               colorClass={GAME_COLORS[index % GAME_COLORS.length]}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section id="matematik">
+        <h2 className="mb-4 text-3xl font-black text-slate-800">Matematik</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {mathGames.map((game, index) => (
+            <GameCard
+              key={game}
+              title={GAME_META[game].title}
+              emoji={GAME_META[game].emoji}
+              description={GAME_META[game].description}
+              href={`/play?game=${game}`}
+              colorClass={GAME_COLORS[(index + 3) % GAME_COLORS.length]}
             />
           ))}
         </div>

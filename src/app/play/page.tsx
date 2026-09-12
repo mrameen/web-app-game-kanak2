@@ -7,17 +7,26 @@ import { AppShell } from "@/components/AppShell";
 import { Confetti } from "@/components/Confetti";
 import { GameResult } from "@/components/GameResult";
 import { ProgressBar } from "@/components/ProgressBar";
-import { StarReward } from "@/components/StarReward";
+import { LevelCompleteSummary } from "@/components/LevelCompleteSummary";
 import { ListenPickGame } from "@/components/game/ListenPickGame";
 import { CombineGame } from "@/components/game/CombineGame";
 import { PickImageGame } from "@/components/game/PickImageGame";
 import { ArrangeSyllablesGame } from "@/components/game/ArrangeSyllablesGame";
 import { CompleteWordGame } from "@/components/game/CompleteWordGame";
+import { MathCountGame } from "@/components/game/MathCountGame";
+import { MathEquationGame } from "@/components/game/MathEquationGame";
 import { usePlayers } from "@/hooks/usePlayers";
 import { GAME_META, getGamesForAge } from "@/lib/content";
 import { checkAnswer, generateLevelQuestions } from "@/lib/game-engine";
 import { applyCorrectAnswer, applyWrongAnswer } from "@/lib/progress";
 import { playAudio, playSuccessTone, playWrongTone, stopAudio, unlockAudio } from "@/lib/audio";
+import {
+  celebrateBgMusic,
+  duckBgMusic,
+  encourageBgMusic,
+  tapBgMusic,
+} from "@/lib/bg-music";
+import { numberToMalay } from "@/lib/math-speech";
 import type {
   GameQuestion,
   GameSessionResult,
@@ -33,7 +42,10 @@ function isGameType(value: string | null): value is GameType {
     value === "combine" ||
     value === "pick-image" ||
     value === "arrange-syllables" ||
-    value === "complete-word"
+    value === "complete-word" ||
+    value === "math-count" ||
+    value === "math-add" ||
+    value === "math-subtract"
   );
 }
 
@@ -50,12 +62,15 @@ function PlayPageInner() {
   const [confettiKey, setConfettiKey] = useState(0);
   const [finished, setFinished] = useState(false);
   const [sessionStars, setSessionStars] = useState(0);
+  const [sessionCorrect, setSessionCorrect] = useState(0);
+  const [sessionWrong, setSessionWrong] = useState(0);
   const [localProgress, setLocalProgress] = useState<PlayerProgress | null>(
     null,
   );
   const [boundKey, setBoundKey] = useState<string | null>(null);
   const [questions, setQuestions] = useState<GameQuestion[]>([]);
   const feedbackTimerRef = useRef<number | null>(null);
+  const finishTimerRef = useRef<number | null>(null);
 
   const requestedGame = searchParams.get("game");
 
@@ -91,6 +106,8 @@ function PlayPageInner() {
     setLocked(false);
     setFinished(false);
     setSessionStars(0);
+    setSessionCorrect(0);
+    setSessionWrong(0);
     setShowConfetti(false);
   }
 
@@ -123,10 +140,31 @@ function PlayPageInner() {
         window.clearTimeout(feedbackTimerRef.current);
         feedbackTimerRef.current = null;
       }
+      if (finishTimerRef.current !== null) {
+        window.clearTimeout(finishTimerRef.current);
+        finishTimerRef.current = null;
+      }
     };
   }, [sessionKey]);
 
   const current = questions[index];
+  const isLastQuestion = questions.length > 0 && index + 1 >= questions.length;
+
+  const goToSummary = useCallback(() => {
+    setShowConfetti(false);
+    setResult(null);
+    setLocked(false);
+    if (feedbackTimerRef.current !== null) {
+      window.clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    if (finishTimerRef.current !== null) {
+      window.clearTimeout(finishTimerRef.current);
+      finishTimerRef.current = null;
+    }
+    stopAudio();
+    setFinished(true);
+  }, []);
 
   const handleAnswer = useCallback(
     (answer: string) => {
@@ -141,6 +179,16 @@ function PlayPageInner() {
         window.clearTimeout(feedbackTimerRef.current);
         feedbackTimerRef.current = null;
       }
+      if (finishTimerRef.current !== null) {
+        window.clearTimeout(finishTimerRef.current);
+        finishTimerRef.current = null;
+      }
+
+      const last = index + 1 >= questions.length;
+
+      if (settings.musicEnabled) {
+        tapBgMusic(settings.volume);
+      }
 
       if (correct) {
         const { progress, result: nextResult } = applyCorrectAnswer(
@@ -152,19 +200,49 @@ function PlayPageInner() {
         saveProgress(progress);
         setResult(nextResult);
         setSessionStars((s) => s + nextResult.starsEarned);
+        setSessionCorrect((c) => c + 1);
         setConfettiKey((k) => k + 1);
         setShowConfetti(true);
+        if (settings.musicEnabled) {
+          celebrateBgMusic(settings.volume);
+        }
         if (settings.soundEnabled) {
           unlockAudio();
-          playSuccessTone(settings.volume);
-          // Biar "Betul!" dengar dulu, kemudian ulang jawapan
-          feedbackTimerRef.current = window.setTimeout(() => {
-            void playAudio(current.targetText, current.promptAudio, {
-              volume: settings.volume,
-              soundEnabled: true,
-            });
-            feedbackTimerRef.current = null;
-          }, 700);
+          const playCorrectFeedback = () => {
+            playSuccessTone(settings.volume);
+            duckBgMusic(1200);
+            feedbackTimerRef.current = window.setTimeout(() => {
+              const isMath =
+                current.gameType === "math-count" ||
+                current.gameType === "math-add" ||
+                current.gameType === "math-subtract";
+              if (isMath) {
+                const n = Number(current.targetText);
+                const spoken = Number.isFinite(n)
+                  ? `Jawapannya ${numberToMalay(n)}`
+                  : current.targetText;
+                void playAudio(spoken, undefined, {
+                  volume: settings.volume,
+                  soundEnabled: true,
+                });
+              } else {
+                void playAudio(current.targetText, current.promptAudio, {
+                  volume: settings.volume,
+                  soundEnabled: true,
+                });
+              }
+              feedbackTimerRef.current = null;
+            }, 700);
+          };
+
+          // Susun suku kata: tunggu 2 saat nampak jawapan dulu, baru bunyi "Betul!"
+          if (current.gameType === "arrange-syllables") {
+            feedbackTimerRef.current = window.setTimeout(() => {
+              playCorrectFeedback();
+            }, 2000);
+          } else {
+            playCorrectFeedback();
+          }
         }
       } else {
         const { progress, result: nextResult } =
@@ -172,11 +250,27 @@ function PlayPageInner() {
         setLocalProgress(progress);
         saveProgress(progress);
         setResult(nextResult);
+        setSessionWrong((w) => w + 1);
         setShowConfetti(false);
+        if (settings.musicEnabled) {
+          encourageBgMusic(settings.volume);
+        }
         if (settings.soundEnabled) {
           unlockAudio();
           playWrongTone(settings.volume);
+          duckBgMusic(700);
         }
+      }
+
+      // Auto show markah after last question so kids don't miss the summary.
+      if (last) {
+        const delay =
+          correct && current.gameType === "arrange-syllables" ? 4500 : 2200;
+        finishTimerRef.current = window.setTimeout(() => {
+          setFinished(true);
+          setResult(null);
+          finishTimerRef.current = null;
+        }, delay);
       }
     },
     [
@@ -184,13 +278,20 @@ function PlayPageInner() {
       localProgress,
       locked,
       gameType,
+      index,
+      questions.length,
       saveProgress,
       settings.soundEnabled,
+      settings.musicEnabled,
       settings.volume,
     ],
   );
 
   const goNext = () => {
+    if (isLastQuestion) {
+      goToSummary();
+      return;
+    }
     setShowConfetti(false);
     setResult(null);
     setLocked(false);
@@ -199,11 +300,6 @@ function PlayPageInner() {
       feedbackTimerRef.current = null;
     }
     stopAudio();
-
-    if (index + 1 >= questions.length) {
-      setFinished(true);
-      return;
-    }
     setIndex((i) => i + 1);
   };
 
@@ -218,33 +314,16 @@ function PlayPageInner() {
   if (finished) {
     return (
       <AppShell>
-        <div className="mx-auto max-w-xl rounded-[2rem] bg-white/90 p-8 text-center shadow-xl">
-          <p className="text-6xl" aria-hidden>
-            🏆
-          </p>
-          <h1 className="mt-4 text-4xl font-black text-slate-800">
-            Tahniah, {activePlayer.name}!
-          </h1>
-          <StarReward stars={sessionStars} message="Level selesai!" />
-          <p className="mt-4 text-lg font-bold text-slate-600">
-            Jumlah bintang: {localProgress.stars.toLocaleString("en-US")}
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => setSessionId((s) => s + 1)}
-              className="min-h-14 flex-1 rounded-2xl bg-emerald-500 text-lg font-black text-white shadow-md"
-            >
-              Main lagi
-            </button>
-            <Link
-              href="/player"
-              className="flex min-h-14 flex-1 items-center justify-center rounded-2xl bg-sky-500 text-lg font-black text-white shadow-md"
-            >
-              Dashboard
-            </Link>
-          </div>
-        </div>
+        <LevelCompleteSummary
+          playerName={activePlayer.name}
+          gameTitle={GAME_META[gameType].title}
+          starsEarned={sessionStars}
+          correctCount={sessionCorrect}
+          wrongCount={sessionWrong}
+          totalStars={localProgress.stars}
+          onPlayAgain={() => setSessionId((s) => s + 1)}
+          onDashboard={() => router.push("/player")}
+        />
       </AppShell>
     );
   }
@@ -309,6 +388,12 @@ function PlayPageInner() {
       {gameType === "complete-word" ? (
         <CompleteWordGame key={current.id} {...sharedProps} />
       ) : null}
+      {gameType === "math-count" ? (
+        <MathCountGame key={current.id} {...sharedProps} />
+      ) : null}
+      {gameType === "math-add" || gameType === "math-subtract" ? (
+        <MathEquationGame key={current.id} {...sharedProps} />
+      ) : null}
 
       {result ? (
         <GameResult
@@ -317,9 +402,7 @@ function PlayPageInner() {
           starsEarned={result.starsEarned}
           leveledUp={result.leveledUp}
           onNext={goNext}
-          nextLabel={
-            index + 1 >= questions.length ? "Lihat ganjaran" : "Seterusnya"
-          }
+          nextLabel={isLastQuestion ? "Lihat markah" : "Seterusnya"}
         />
       ) : null}
 

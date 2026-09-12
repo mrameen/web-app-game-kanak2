@@ -5,9 +5,14 @@ import {
   getActivePlayer,
   setActivePlayer as persistActivePlayer,
   createPlayer as persistCreatePlayer,
+  resumeOrCreatePlayer as persistResumeOrCreate,
+  clearActivePlayer as persistClearActive,
   updatePlayerProgress,
   resetPlayerProgress,
   updateSettings,
+  deletePlayer as persistDeletePlayer,
+  deleteAllPlayers as persistDeleteAllPlayers,
+  updatePlayerAge as persistUpdatePlayerAge,
 } from "@/lib/storage";
 import {
   DEFAULT_SETTINGS,
@@ -125,6 +130,25 @@ export function usePlayers() {
     return player;
   }, []);
 
+  const resumeOrCreate = useCallback((name: string, age: AgeGroup) => {
+    const player = persistResumeOrCreate(name, age);
+    emitChange();
+    return player;
+  }, []);
+
+  const logoutPlayer = useCallback(() => {
+    persistClearActive();
+    emitChange();
+  }, []);
+
+  const updateAge = useCallback((age: AgeGroup, playerId?: string) => {
+    const id = playerId ?? getActivePlayer()?.id;
+    if (!id) return null;
+    const updated = persistUpdatePlayerAge(id, age);
+    emitChange();
+    return updated;
+  }, []);
+
   const saveProgress = useCallback((progress: PlayerProgress) => {
     const current = getActivePlayer();
     if (!current) return null;
@@ -133,12 +157,22 @@ export function usePlayers() {
     return updated;
   }, []);
 
-  const resetProgress = useCallback(() => {
-    const current = getActivePlayer();
-    if (!current) return null;
-    const updated = resetPlayerProgress(current.id);
+  const resetProgress = useCallback((playerId?: string) => {
+    const id = playerId ?? getActivePlayer()?.id;
+    if (!id) return null;
+    const updated = resetPlayerProgress(id);
     emitChange();
     return updated;
+  }, []);
+
+  const removePlayer = useCallback((playerId: string) => {
+    persistDeletePlayer(playerId);
+    emitChange();
+  }, []);
+
+  const removeAllPlayers = useCallback(() => {
+    persistDeleteAllPlayers();
+    emitChange();
   }, []);
 
   const saveSettings = useCallback((partial: Partial<AppSettings>) => {
@@ -154,8 +188,13 @@ export function usePlayers() {
     settings: data.settings,
     selectPlayer,
     addPlayer,
+    resumeOrCreate,
+    logoutPlayer,
+    updateAge,
     saveProgress,
     resetProgress,
+    removePlayer,
+    removeAllPlayers,
     saveSettings,
     refresh: emitChange,
   };

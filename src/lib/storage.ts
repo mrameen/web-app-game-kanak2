@@ -86,6 +86,46 @@ export function createPlayer(name: string, age: AgeGroup): Player {
   return player;
 }
 
+export function findPlayerByName(name: string): Player | null {
+  const needle = name.trim().toLowerCase();
+  if (!needle) return null;
+  return (
+    loadStorage().players.find((p) => p.name.trim().toLowerCase() === needle) ??
+    null
+  );
+}
+
+/** Public entry: resume same name on this device, or create new profile. */
+export function resumeOrCreatePlayer(name: string, age: AgeGroup): Player {
+  const existing = findPlayerByName(name);
+  if (existing) {
+    const data = loadStorage();
+    const index = data.players.findIndex((p) => p.id === existing.id);
+    if (index !== -1 && data.players[index].age !== age) {
+      data.players[index] = { ...data.players[index], age };
+    }
+    data.activePlayerId = existing.id;
+    saveStorage(data);
+    return data.players.find((p) => p.id === existing.id) ?? existing;
+  }
+  return createPlayer(name, age);
+}
+
+export function clearActivePlayer(): void {
+  const data = loadStorage();
+  data.activePlayerId = null;
+  saveStorage(data);
+}
+
+export function updatePlayerAge(playerId: string, age: AgeGroup): Player | null {
+  const data = loadStorage();
+  const index = data.players.findIndex((p) => p.id === playerId);
+  if (index === -1) return null;
+  data.players[index] = { ...data.players[index], age };
+  saveStorage(data);
+  return data.players[index];
+}
+
 export function updatePlayerProgress(
   playerId: string,
   progress: PlayerProgress,
@@ -123,7 +163,14 @@ export function deletePlayer(playerId: string): void {
   const data = loadStorage();
   data.players = data.players.filter((p) => p.id !== playerId);
   if (data.activePlayerId === playerId) {
-    data.activePlayerId = data.players[0]?.id ?? null;
+    data.activePlayerId = null;
   }
+  saveStorage(data);
+}
+
+export function deleteAllPlayers(): void {
+  const data = loadStorage();
+  data.players = [];
+  data.activePlayerId = null;
   saveStorage(data);
 }

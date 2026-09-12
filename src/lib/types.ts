@@ -1,4 +1,4 @@
-export type AgeGroup = 3 | 4 | 5;
+export type AgeGroup = 3 | 4 | 5 | 6;
 
 export type ContentType = "letter" | "syllable" | "word" | "sentence";
 
@@ -7,7 +7,12 @@ export type GameType =
   | "combine"
   | "pick-image"
   | "arrange-syllables"
-  | "complete-word";
+  | "complete-word"
+  | "math-count"
+  | "math-add"
+  | "math-subtract";
+
+export type GameCategory = "reading" | "math";
 
 export interface ReadingItem {
   id: string;
@@ -68,6 +73,9 @@ export interface GameQuestion {
   syllables?: string[];
   imageOptions?: { id: string; emoji: string; label: string }[];
   contentId: string;
+  /** For math-count: repeated emoji string */
+  countEmoji?: string;
+  countValue?: number;
 }
 
 export interface GameSessionResult {
@@ -84,6 +92,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   musicEnabled: false,
   volume: 0.8,
 };
+
+export const AGE_GROUPS: AgeGroup[] = [3, 4, 5, 6];
 
 export function createEmptyProgress(): PlayerProgress {
   return {

@@ -37,12 +37,28 @@
   }
 }
 
+@keyframes bgm-bar {
+  from {
+    transform: scaleY(0.4);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1.2);
+    opacity: 1;
+  }
+}
+
 .animate-bounce-soft {
   animation: bounce-soft 0.9s ease-in-out infinite;
 }
 
 .animate-confetti {
   animation: confetti-fall 1.2s ease-out forwards;
+}
+
+.animate-bgm-bar {
+  transform-origin: bottom;
+  animation: bgm-bar 0.55s ease-in-out infinite alternate;
 }
 
 body {

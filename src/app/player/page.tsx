@@ -8,7 +8,7 @@ import { usePlayers } from "@/hooks/usePlayers";
 
 export default function PlayerPage() {
   const router = useRouter();
-  const { hydrated, activePlayer } = usePlayers();
+  const { hydrated, activePlayer, updateAge } = usePlayers();
 
   useEffect(() => {
     if (hydrated && !activePlayer) {
@@ -28,7 +28,12 @@ export default function PlayerPage() {
 
   return (
     <AppShell>
-      <PlayerDashboard player={activePlayer} />
+      <PlayerDashboard
+        player={activePlayer}
+        onChangeAge={(age) => {
+          updateAge(age);
+        }}
+      />
     </AppShell>
   );
 }

@@ -3,6 +3,7 @@ import {
   getWordsWithEmoji,
   ALL_CONTENT,
 } from "./content";
+import { generateMathLevelQuestions, generateMathQuestion } from "./math-engine";
 import type {
   AgeGroup,
   GameType,
@@ -10,6 +11,16 @@ import type {
   PlayerProgress,
   ReadingItem,
 } from "./types";
+
+function isMathGame(
+  gameType: GameType,
+): gameType is "math-count" | "math-add" | "math-subtract" {
+  return (
+    gameType === "math-count" ||
+    gameType === "math-add" ||
+    gameType === "math-subtract"
+  );
+}
 
 function shuffle<T>(items: T[]): T[] {
   const arr = [...items];
@@ -31,7 +42,7 @@ function optionCount(age: AgeGroup, bonus: number): number {
 }
 
 function maxDifficulty(age: AgeGroup, bonus: number): number {
-  const base = age === 3 ? 1 : age === 4 ? 2 : 3;
+  const base = age === 3 ? 1 : age === 4 ? 2 : age === 5 ? 3 : 3;
   return Math.min(3, base + Math.max(0, bonus - 1));
 }
 
@@ -198,7 +209,8 @@ function makeArrange(
     promptEmoji: target.emoji,
     targetText: target.text,
     options: shuffle(syllables),
-    correctAnswer: syllables.join(""),
+    // Use delimiter so order is checked (LA+BO !== BO+LA), not just concatenated letters.
+    correctAnswer: syllables.join("|"),
     syllables,
     contentId: target.id,
   };
@@ -246,9 +258,8 @@ function makeComplete(
   };
 }
 
-const BUILDERS: Record<
-  GameType,
-  (age: AgeGroup, progress: PlayerProgress) => GameQuestion | null
+const BUILDERS: Partial<
+  Record<GameType, (age: AgeGroup, progress: PlayerProgress) => GameQuestion | null>
 > = {
   "listen-pick": makeListenPick,
   combine: makeCombine,
@@ -262,7 +273,11 @@ export function generateQuestion(
   age: AgeGroup,
   progress: PlayerProgress,
 ): GameQuestion {
-  const question = BUILDERS[gameType](age, progress);
+  if (isMathGame(gameType)) {
+    return generateMathQuestion(gameType, age, progress);
+  }
+
+  const question = BUILDERS[gameType]?.(age, progress);
   if (question) return question;
 
   // Fallback so play never stalls.
@@ -286,6 +301,10 @@ export function generateLevelQuestions(
   progress: PlayerProgress,
   count = 5,
 ): GameQuestion[] {
+  if (isMathGame(gameType)) {
+    return generateMathLevelQuestions(gameType, age, progress, count);
+  }
+
   const questions: GameQuestion[] = [];
   const seen = new Set<string>();
 
@@ -308,7 +327,23 @@ export function checkAnswer(
   answer: string,
 ): boolean {
   if (question.gameType === "arrange-syllables") {
-    return answer.replace(/\s+/g, "") === question.correctAnswer.replace(/\s+/g, "");
+    const expected = (question.syllables ?? []).map((s) => s.toUpperCase());
+    const got = answer
+      .split("|")
+      .map((s) => s.trim().toUpperCase())
+      .filter(Boolean);
+
+    // Fallback for older joined answers without delimiter
+    if (got.length === 1 && expected.length > 1) {
+      return false;
+    }
+
+    if (got.length !== expected.length) return false;
+    return got.every((part, i) => part === expected[i]);
+  }
+  // Math answers are numeric strings — compare without case tricks breaking numbers
+  if (isMathGame(question.gameType)) {
+    return answer.trim() === question.correctAnswer.trim();
   }
   return answer.trim().toUpperCase() === question.correctAnswer.trim().toUpperCase();
 }

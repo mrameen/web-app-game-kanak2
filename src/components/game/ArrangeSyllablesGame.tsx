@@ -22,6 +22,7 @@ export function ArrangeSyllablesGame({
 }: Props) {
   const [bank, setBank] = useState(() => question.options);
   const [slots, setSlots] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!soundEnabled || !isAudioUnlocked()) return;
@@ -37,21 +38,31 @@ export function ArrangeSyllablesGame({
     soundEnabled,
   ]);
 
-  const pick = (syllable: string, index: number) => {
-    if (disabled) return;
+  const pick = async (syllable: string, index: number) => {
+    if (disabled || busy) return;
+
     const nextBank = [...bank];
     nextBank.splice(index, 1);
     const nextSlots = [...slots, syllable];
+    const needed = question.syllables?.length ?? 0;
+    const willComplete = nextSlots.length === needed;
+
+    setBusy(true);
     setBank(nextBank);
     setSlots(nextSlots);
+    unlockAudio();
+    // Play full syllable sound before submitting, so the last pick is not cut off.
+    await playAudio(syllable, undefined, { volume, soundEnabled });
+    setBusy(false);
 
-    if (nextSlots.length === (question.syllables?.length ?? 0)) {
-      onAnswer(nextSlots.join(""));
+    if (willComplete) {
+      // Order-sensitive: "LA|BO" !== "BO|LA"
+      onAnswer(nextSlots.join("|"));
     }
   };
 
   const undo = () => {
-    if (disabled || slots.length === 0) return;
+    if (disabled || busy || slots.length === 0) return;
     const nextSlots = [...slots];
     const last = nextSlots.pop()!;
     setSlots(nextSlots);
@@ -100,12 +111,10 @@ export function ArrangeSyllablesGame({
           <button
             key={`${syllable}-${index}`}
             type="button"
-            disabled={disabled}
+            disabled={disabled || busy}
             aria-label={`Pilih suku kata ${syllable}`}
             onClick={() => {
-              unlockAudio();
-              void playAudio(syllable, undefined, { volume, soundEnabled });
-              pick(syllable, index);
+              void pick(syllable, index);
             }}
             className="min-h-16 rounded-2xl bg-amber-300 px-6 text-3xl font-black text-amber-950 shadow-md transition hover:bg-amber-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-800 disabled:opacity-60"
           >
@@ -117,7 +126,7 @@ export function ArrangeSyllablesGame({
       <button
         type="button"
         onClick={undo}
-        disabled={disabled || slots.length === 0}
+        disabled={disabled || busy || slots.length === 0}
         aria-label="Buang susunan terakhir"
         className="mx-auto block rounded-xl bg-white px-4 py-2 text-base font-bold text-slate-600 shadow disabled:opacity-40"
       >

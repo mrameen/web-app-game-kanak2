@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { AgeSelector } from "@/components/AgeSelector";
 import { usePlayers } from "@/hooks/usePlayers";
+import { unlockAudio } from "@/lib/audio";
+import {
+  celebrateBgMusic,
+  startBgMusic,
+  stopBgMusic,
+  tapBgMusic,
+} from "@/lib/bg-music";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -14,18 +21,19 @@ export default function SettingsPage() {
     settings,
     saveSettings,
     resetProgress,
-    players,
+    logoutPlayer,
+    updateAge,
   } = usePlayers();
   const [confirmReset, setConfirmReset] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (hydrated && players.length === 0) {
+    if (hydrated && !activePlayer) {
       router.replace("/");
     }
-  }, [hydrated, players.length, router]);
+  }, [hydrated, activePlayer, router]);
 
-  if (!hydrated) {
+  if (!hydrated || !activePlayer) {
     return (
       <AppShell title="Settings">
         <div className="text-xl font-bold text-slate-600">Memuatkan...</div>
@@ -37,19 +45,38 @@ export default function SettingsPage() {
     <AppShell title="Settings">
       <div className="space-y-5">
         <section className="rounded-[2rem] bg-white/85 p-6 shadow-lg">
-          <h2 className="text-2xl font-black text-slate-800">Pemain</h2>
+          <h2 className="text-2xl font-black text-slate-800">Akaun saya</h2>
           <p className="mt-2 text-lg font-semibold text-slate-600">
-            Aktif: {activePlayer?.name ?? "Tiada"}
+            {activePlayer.name} · Umur {activePlayer.age}
           </p>
-          <Link
-            href="/"
+          <button
+            type="button"
+            onClick={() => {
+              logoutPlayer();
+              router.replace("/");
+            }}
             className="mt-4 inline-flex min-h-12 items-center rounded-2xl bg-sky-500 px-5 text-base font-black text-white"
           >
-            Tukar pemain
-          </Link>
+            Keluar / Tukar nama
+          </button>
         </section>
 
-        <section className="rounded-[2rem] bg-white/85 p-6 shadow-lg space-y-4">
+        <section className="rounded-[2rem] bg-white/85 p-6 shadow-lg">
+          <h2 className="text-2xl font-black text-slate-800">Tukar umur</h2>
+          <p className="mt-2 mb-4 text-base font-semibold text-slate-600">
+            Boleh tukar bila-bila masa. Tahap permainan akan ikut umur baharu.
+          </p>
+          <AgeSelector
+            compact
+            value={activePlayer.age}
+            onSelect={(age) => {
+              updateAge(age);
+              setMessage(`Umur dikemaskini ke ${age} tahun.`);
+            }}
+          />
+        </section>
+
+        <section className="space-y-4 rounded-[2rem] bg-white/85 p-6 shadow-lg">
           <h2 className="text-2xl font-black text-slate-800">Bunyi</h2>
 
           <ToggleRow
@@ -60,8 +87,41 @@ export default function SettingsPage() {
           <ToggleRow
             label="Muzik latar"
             checked={settings.musicEnabled}
-            onChange={(checked) => saveSettings({ musicEnabled: checked })}
+            onChange={(checked) => {
+              unlockAudio();
+              saveSettings({ musicEnabled: checked });
+              if (checked) {
+                void startBgMusic(settings.volume).then(() => {
+                  tapBgMusic(settings.volume);
+                  window.setTimeout(() => celebrateBgMusic(settings.volume), 180);
+                });
+                setMessage("Muzik latar dihidupkan — cuba jawab soalan!");
+              } else {
+                stopBgMusic();
+                setMessage("Muzik latar dimatikan.");
+              }
+            }}
           />
+
+          {settings.musicEnabled ? (
+            <div className="flex items-center gap-3 rounded-2xl bg-amber-50 px-4 py-3">
+              <div className="flex h-8 items-end gap-1" aria-hidden>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <span
+                    key={i}
+                    className="animate-bgm-bar w-1.5 rounded-full bg-amber-500"
+                    style={{
+                      height: `${10 + (i % 3) * 7}px`,
+                      animationDelay: `${i * 0.09}s`,
+                    }}
+                  />
+                ))}
+              </div>
+              <p className="text-sm font-bold text-amber-900">
+                Muzik ikut permainan — betul ada sparkle, salah ada nada lembut.
+              </p>
+            </div>
+          ) : null}
 
           <label className="block">
             <span className="mb-2 block text-base font-bold text-slate-700">
@@ -82,9 +142,9 @@ export default function SettingsPage() {
         </section>
 
         <section className="rounded-[2rem] bg-white/85 p-6 shadow-lg">
-          <h2 className="text-2xl font-black text-slate-800">Progress</h2>
+          <h2 className="text-2xl font-black text-slate-800">Progress saya</h2>
           <p className="mt-2 text-base font-semibold text-slate-600">
-            Reset progress pemain aktif.
+            Reset progress akaun ini sahaja.
           </p>
 
           {!confirmReset ? (
@@ -98,7 +158,7 @@ export default function SettingsPage() {
           ) : (
             <div className="mt-4 space-y-3 rounded-2xl bg-rose-50 p-4">
               <p className="font-bold text-rose-800">
-                Pastikan? Progress {activePlayer?.name} akan dipadam.
+                Pastikan? Progress {activePlayer.name} akan dipadam.
               </p>
               <div className="flex gap-3">
                 <button

@@ -8,17 +8,27 @@
  * SpeechSynthesis outside the user-gesture window.
  */
 
+import { duckBgMusic } from "@/lib/bg-music";
+
 let currentAudio: HTMLAudioElement | null = null;
 let audioUnlocked = false;
 const audioFileCache = new Map<string, boolean>();
+/** Resolves the in-flight MP3 promise when playback is intentionally stopped. */
+let abortCurrentPlay: ((wasInterrupted: boolean) => void) | null = null;
 
 export function isAudioUnlocked(): boolean {
   return audioUnlocked;
 }
 
 function stopMp3Only(): void {
+  const abort = abortCurrentPlay;
+  abortCurrentPlay = null;
+  if (abort) abort(true);
+
   if (currentAudio) {
     try {
+      currentAudio.onended = null;
+      currentAudio.onerror = null;
       currentAudio.pause();
       currentAudio.src = "";
     } catch {
@@ -43,6 +53,11 @@ function stopAll(): void {
 export function unlockAudio(): void {
   if (typeof window === "undefined") return;
   audioUnlocked = true;
+
+  // Allow retry of files previously marked missing (e.g. interrupted plays).
+  for (const [url, ok] of audioFileCache) {
+    if (!ok) audioFileCache.delete(url);
+  }
 
   try {
     if ("speechSynthesis" in window) {
@@ -88,12 +103,11 @@ function pickVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) return null;
 
+  // Prefer Malay/Indonesian only — English voices letter-spell "LA" / "JU".
   return (
     voices.find((v) => v.lang.toLowerCase().startsWith("ms")) ||
     voices.find((v) => v.lang.toLowerCase().startsWith("id")) ||
     voices.find((v) => /malaysia|malay|indonesia/i.test(v.name)) ||
-    voices.find((v) => v.lang.toLowerCase().startsWith("en")) ||
-    voices[0] ||
     null
   );
 }
@@ -106,11 +120,15 @@ function speakWithSynthesis(text: string, volume: number): Promise<void> {
     }
 
     const synth = window.speechSynthesis;
-    const clean = text.trim();
-    if (!clean) {
+    const raw = text.trim();
+    if (!raw) {
       resolve();
       return;
     }
+
+    // ALL-CAPS short tokens (LA, JU, BO) get letter-spelled by many voices ("el-ay").
+    // Speak lowercase so syllables sound like Malay sounds, not English letter names.
+    const clean = /^[A-Za-z]{1,6}$/.test(raw) ? raw.toLowerCase() : raw;
 
     const start = () => {
       try {
@@ -184,8 +202,12 @@ function playAudioFile(url: string, volume: number): Promise<boolean> {
       const finish = (ok: boolean) => {
         if (settled) return;
         settled = true;
+        if (abortCurrentPlay) abortCurrentPlay = null;
         resolve(ok);
       };
+
+      // Intentional stop (new clip / feedback) — do not treat as missing file.
+      abortCurrentPlay = () => finish(true);
 
       audio.onended = () => finish(true);
       audio.onerror = () => finish(false);
@@ -195,9 +217,10 @@ function playAudioFile(url: string, volume: number): Promise<boolean> {
         () => finish(false),
       );
 
+      // Safety only — wait for natural end so syllable audio is not cut early.
       setTimeout(() => {
-        if (!settled && audio.paused) finish(false);
-      }, 1500);
+        if (!settled) finish(currentAudio === audio);
+      }, 6000);
     } catch {
       resolve(false);
     }
@@ -245,9 +268,11 @@ export async function playAudio(
   if (!soundEnabled || typeof window === "undefined") return;
 
   const url = resolveAudioUrl(text, audioUrl);
+  duckBgMusic(1000);
 
   try {
-    stopMp3Only();
+    // Stop prior MP3 + speech so the next syllable is not cut/skipped.
+    stopAll();
 
     if (url) {
       // Skip known-missing files; otherwise try MP3 immediately.
@@ -257,6 +282,7 @@ export async function playAudio(
           audioFileCache.set(url, true);
           return;
         }
+        // Only remember missing files — interrupted plays resolve true above.
         audioFileCache.set(url, false);
       }
     }
