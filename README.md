@@ -52,14 +52,17 @@ Jika fail `.mp3` belum wujud, app guna **SpeechSynthesis** (`ms-MY`) sebagai fal
 
 ## PWA
 
-App boleh dipasang ke skrin utama (Add to Home Screen / Install app).
+App boleh ditambah ke skrin utama telefon (Add to Home Screen).
 
 - Manifest: `/manifest.webmanifest`
-- Service worker dijana semasa `npm run build` (`@ducanh2912/next-pwa`)
-- Offline fallback: `/~offline`
 - Ikon: `public/icons/`
+- Service worker ringan: `public/sw.js` (aktif pada HTTPS / localhost)
+- Offline fallback: `/~offline`
 
-Pada telefon: buka app → menu pelayar → **Add to Home Screen** / **Install**.
+**Android/Chrome:** menu → Install app / Add to Home screen  
+**iPhone Safari:** Share → Add to Home Screen
+
+Nota: service worker penuh memerlukan HTTPS (atau localhost). Pada HTTP LAN, ikon + “Add to Home Screen” masih berfungsi.
 
 ## Progress
 
