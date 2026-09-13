@@ -50,6 +50,17 @@ public/audio/
 
 Jika fail `.mp3` belum wujud, app guna **SpeechSynthesis** (`ms-MY`) sebagai fallback melalui `playAudio(text, audioUrl?)`.
 
+## PWA
+
+App boleh dipasang ke skrin utama (Add to Home Screen / Install app).
+
+- Manifest: `/manifest.webmanifest`
+- Service worker dijana semasa `npm run build` (`@ducanh2912/next-pwa`)
+- Offline fallback: `/~offline`
+- Ikon: `public/icons/`
+
+Pada telefon: buka app → menu pelayar → **Add to Home Screen** / **Install**.
+
 ## Progress
 
 Disimpan dalam localStorage key: `reading-game-player`.
